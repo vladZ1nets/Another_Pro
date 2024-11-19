@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "login": "user1",
+    "password": "pjfdvnd",
+    "ipn": 786876,
+    "full_name": "oleh kjjio",
+    "contacts": "1",
+    "photo": "url1",
+    "passport": "ygyj65765"
+  },
+  {
+    "id": 2,
+    "login": "user2",
+    "password": "jubkjhk",
+    "ipn": 986876875,
+    "full_name": "lina hjvg",
+    "contacts": "1",
+    "photo": "url2",
+    "passport": "hglkug6576"
+  }
+]
