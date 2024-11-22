@@ -5,6 +5,46 @@
     <title>Title</title>
 </head>
 <body>
+<table>
+<thead>
+    <tr>
+      <th scope="col">Photo</th>
+      <th scope="col">name</th>
+      <th scope="col">description</th>
+      <th scope="col">price per hour</th>
+      <th scope="col">price per day</th>
+      <th scope="col">price per week</th>
+      <th scope="col">price per month</th>
+      <th scope="col">Owner name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{{photo}}</td>
+      <td>{{name}}</td>
+      <td>{{description}}</td>
+      <td>{{phour}}</td>
+      <td>{{pday}}</td>
+      <td>{{pweek}}</td>
+      <td>{{pmonth}}</td>
+      <th scope="col">{{owner_name}}</th>
+    </tr>
+  </tbody>
+</table>
+
+
+{% if owner_id == current_user %}
+<form action="/items/{{ item_id }}/delete" method="post">
+    <input type="submit" value="DELETE">
+</form>
+{% else %}
+    <form action="/contacts" method="post">
+    <input type="date" name = "start_date">
+    <input type="date" name = "end_date">
+    <input type="hidden" name="item_id" value="{{ item_id }}">
+    <input type="submit">
+</form>
+{% endif %}
 
 </body>
 </html>

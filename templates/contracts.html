@@ -6,5 +6,41 @@
 </head>
 <body>
 
+<h1>My debts</h1>
+<table>
+    <tr>
+        <th>Text</th>
+        <th>Start date</th>
+        <th>End date</th>
+        <th>details</th>
+    </tr>
+        {% for one_contract in my_contracts %}
+    <tr>
+    <td>{{one_contract.text}}</td>
+    <td>{{ one_contract.start_date }}</td>
+    <td>{{ one_contract.end_date }}</td>
+    <td><a href="/contracts/{{ one_contract.id }}">Details</a></td>
+    </tr>
+    {% endfor %}
+</table>
+<br><br>
+<h1>My items in use</h1>
+<table>
+    <tr>
+        <th>Text</th>
+        <th>Start date</th>
+        <th>End date</th>
+        <th>details</th>
+    </tr>
+        {% for one_contract in contracts_by_my_Items %}
+    <tr>
+    <td>{{one_contract.text}}</td>
+    <td>{{ one_contract.start_date }}</td>
+    <td>{{ one_contract.end_date }}</td>
+    <td><a href="/contracts/{{ one_contract.id }}">Details</a></td>
+    </tr>
+    {% endfor %}
+</table>
+
 </body>
 </html>

@@ -7,7 +7,7 @@
 <body>
 
 {% for one_item in items %}
-    <div>{{ one_item.name }} | {{ one_item["description"] }}price: {{ one_item.price_hour }} per hour</div>
+    <div><a href="/items/{{ one_item.id }}">{{ one_item.name }}</a> | {{ one_item["description"] }}price: {{ one_item.price_hour }} per hour; is Available: {{ one_item.available }}</div>
 {% endfor %}
 
 </body>

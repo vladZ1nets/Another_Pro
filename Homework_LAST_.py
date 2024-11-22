@@ -1,7 +1,10 @@
+from datetime import datetime
 from functools import wraps
 from flask import Flask, request, render_template, redirect, url_for, session
 from sqlalchemy import create_engine, select, update, delete
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql.functions import current_user, func
+
 from database import init_db, db_session
 import models
 
@@ -32,7 +35,7 @@ def login():
         password = request.form['password']
 
         init_db()
-        user_data = db_session.execute(select(models.User).filter_by(login=username)).first()
+        user_data = db_session.execute(select(models.User).filter_by(login=username, password=password)).scalar()
         if user_data:
             session['logged_in'] = user_data.login
             session['user_id'] = user_data.id
@@ -65,8 +68,19 @@ def logout():
 @login_required
 def items():
     if request.method == 'GET':
-        items = db_session.execute(select(models.Item)).scalars().all()
-        return render_template('item.html', items=items)
+        #items = db_session.execute(select(models.Item)).scalars().all()
+        items = db_session.query(models.Item, models.Contract).\
+    outerjoin(models.Contract,
+              (models.Item.id == models.Contract.item_id) &
+              (func.date(datetime.date.today()) >= func.date(models.Contract.start_date)) &
+              (func.date(datetime.data.today()) <= func.data(models.Contract.end_date))).all
+
+        render_items = []
+        for item in items:
+            render_items.append(dict( name = item.Item.name, available = True if item.Contract is None else False, id = item.Item.id, description = item.Item.description))
+        return render_template('item.html', items=render_items)
+
+
     elif request.method == 'POST':
         if session.get('logged_in') is None:
             return redirect('/login')
@@ -82,13 +96,18 @@ def items():
             return redirect('/items')
 
 
-@app.route('/items/<int:item_id>', methods=['GET', 'DELETE'])
+@app.route('/items/<int:item_id>', methods=['GET'])
 @login_required
 def item_detail(item_id):
     if request.method == 'GET':
         item = db_session.execute(select(models.Item).filter_by(id=item_id)).scalar()
-        return render_template('item_detail.html', item=item)
-    elif request.method == 'DELETE':
+        return render_template('item_detail.html', item_id=item_id, photo=item.photo, name=item.name,
+                               description=item.description, phour=item.price_hour, pday=item.price_day,
+                               pweek=item.price_week, pmonth=item.price_month, owner_id=item.owner_id, current_user=session.get('user_id'))
+
+@app.route('/items/<int:item_id/delete>', methods=['POST'])
+@login_required
+def delete_item(item_id):
         item = db_session.execute(select(models.Item).filter_by(id=item_id)).scalar()
         if item:
             db_session.delete(item)
@@ -179,11 +198,18 @@ def leaser_detail(leaser_id):
 @login_required
 def contracts():
     if request.method == 'GET':
-        contracts = db_session.execute(select(models.Contract)).scalars().all()
-        return render_template('contracts.html', contracts=contracts)
+        my_contracts = db_session.execute(select(models.Contract).filter_by(taker_id=session['user_id'])).scalars().all()
+
+        contracts_by_my_Items = db_session.execute(select(models.Contract).filter_by(leaser_id=session['user_id'])).scalars().all()
+
+        return render_template('contracts.html', my_contracts=my_contracts, contracts_by_my_Items=contracts_by_my_Items)
     elif request.method == 'POST':
         contract_data = request.form.to_dict()
         new_contract = models.Contract(**contract_data)
+        taker_id = session['user_id']
+        leaser = db_session.execute(select(models.Item).filter_by(id=contract_data['item_id'])).scalar()
+        new_contract.taker_id = taker_id
+        new_contract.leaser_id = leaser.id
         db_session.add(new_contract)
         db_session.commit()
         return redirect('/contracts')
@@ -194,14 +220,8 @@ def contracts():
 def contract_detail(contract_id):
     if request.method == 'GET':
         contract = db_session.execute(select(models.Contract).filter_by(id=contract_id)).scalar()
+
         return render_template('contract_detail.html', contract=contract)
-    elif request.method == 'PATCH':
-        contract = db_session.execute(select(models.Contract).filter_by(id=contract_id)).scalar()
-        contract.status = 'updated'
-        db_session.commit()
-        return redirect(f'/contracts/{contract_id}')
-    elif request.method == 'PUT':
-        pass
 
 
 @app.route('/search', methods=['GET', 'POST'])
