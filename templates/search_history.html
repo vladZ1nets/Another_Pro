@@ -2,9 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <div class="container">
+        <h1>Your Search History</h1>
 
+        {% if history %}
+        <ul class="search-history-list">
+            {% for entry in history %}
+            <li>
+                <p><strong>Search Query:</strong> {{ entry.search_text }}</p>
+                <p><strong>Timestamp:</strong> {{ entry.timestamp }}</p>
+                <form action="{{ url_for('search_history') }}" method="POST">
+                    <input type="hidden" name="search_id" value="{{ entry.id }}">
+                    <button type="submit" name="action" value="delete">Delete This Search</button>
+                </form>
+                <hr>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <form action="{{ url_for('search_history') }}" method="POST">
+            <button type="submit" name="action" value="clear">Clear All Search History</button>
+        </form>
+
+        {% else %}
+        <p>You have no search history yet.</p>
+        {% endif %}
+
+        <a href="{{ url_for('profile') }}">Back to Profile</a>
+    </div>
 </body>
 </html>

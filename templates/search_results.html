@@ -2,9 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
 </head>
 <body>
-
+    <h2>Search Results</h2>
+    <ul>
+        {% for result in results %}
+            <li>
+                <strong>{{ result.name }}</strong> - {{ result.description }}
+            </li>
+        {% endfor %}
+    </ul>
 </body>
 </html>
