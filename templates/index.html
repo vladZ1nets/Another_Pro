@@ -8,6 +8,11 @@
 </head>
 <body>
     <h1>Welcome to our page!</h1>
-    <p>This is a simple example of a page in Flask.</p>
+
+    <!-- Посилання на сторінки реєстрації та логіну -->
+    <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+    <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+
 </body>
 </html>
+
