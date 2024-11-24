@@ -15,8 +15,13 @@ class User(Base):
     photo = Column(String(150))
     passport = Column(String(100))
     email = Column(String(120), nullable=True)
+    role = Column(String(50), nullable=False, default='taker')
+
+    favorites = relationship('Favorite', back_populates='user')
+
     def __repr__(self):
         return f'<User {self.login}, {self.full_name}>'
+
 
 class Item(Base):
     __tablename__ = 'items'
@@ -29,6 +34,8 @@ class Item(Base):
     price_week = Column(REAL)
     price_month = Column(REAL)
     owner_id = Column(Integer, ForeignKey('users.id'))
+
+    favorites = relationship('Favorite', back_populates='item')
 
     def __repr__(self):
         return f'<Item {self.name}, {self.id}, Owner: {self.owner_id}>'
@@ -47,12 +54,15 @@ class Contract(Base):
     def __repr__(self):
         return f'<Contract {self.id}, Leaser: {self.leaser_id}, Taker: {self.taker_id}>'
 
-class Favorites(Base):
+class Favorite(Base):
     __tablename__ = 'favorites'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    item_id = Column(Integer, ForeignKey('items.id'))
 
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    item_id = Column(Integer, ForeignKey('items.id'), nullable=False)
+
+    user = relationship('User', back_populates='favorites')
+    item = relationship('Item', back_populates='favorites')
 
     def __repr__(self):
         return f'<Favorite {self.id}, User: {self.user_id}, Item: {self.item_id}>'
@@ -76,7 +86,6 @@ class SearchHistory(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     search_text = Column(Text)
     timestamp = Column(Integer)
-
 
     def __repr__(self):
         return f'<SearchHistory {self.id}, User: {self.user_id}, Search: {self.search_text}>'

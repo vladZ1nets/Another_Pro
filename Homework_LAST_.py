@@ -23,7 +23,7 @@ def login_required(func):
 
 @app.route('/')
 def hello_world():
-    return 'Hello World!'
+    return render_template('index.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -100,7 +100,7 @@ def items():
             return redirect('/items')
 
 
-@app.route('/items/<int:item_id>', methods=['GET'])
+@app.route('/<int:item_id>/items/', methods=['GET'])
 @login_required
 def item_detail(item_id):
     item = db_session.execute(select(models.Item).filter_by(id=item_id)).scalar()
