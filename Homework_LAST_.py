@@ -263,8 +263,16 @@ def search():
 def compare():
     if request.method == 'GET':
         contract_ids = request.args.getlist('contract_ids')
+
+        if len(contract_ids) != 2:
+            return "Please provide exactly two contract IDs in the 'contract_ids' parameter", 400
+
         contract_1 = db_session.execute(select(models.Contract).filter_by(id=contract_ids[0])).scalar()
         contract_2 = db_session.execute(select(models.Contract).filter_by(id=contract_ids[1])).scalar()
+
+        if not contract_1 or not contract_2:
+            return "One or both contracts not found.", 404
+
         return render_template('compare.html', contract_1=contract_1, contract_2=contract_2)
 
 
